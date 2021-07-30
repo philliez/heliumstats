@@ -1,5 +1,7 @@
  import React, { useState, useEffect} from 'react'
  import axios from 'axios'
+ import { List, Table, Card } from 'semantic-ui-react'
+
 
  export default function App() {
   const url = 'https://api.helium.wtf/v1/accounts/rich?limit=20'
@@ -13,28 +15,31 @@
   const renderTable = () => {
     return data.map(account => {
       return (
-        <tr>
-          <td>{account.balance}</td>
-          <td>{account.address}</td>
-            </tr>
+        <Table.Row>
+          <Table.Cell>{account.balance}</Table.Cell>
+          <Table.Cell>{account.address}</Table.Cell>
+            </Table.Row>
       )
     })
   }
 
   return (
-    <div>
-      <h1 id="title">richest accts</h1>
-      <table id="richest"> 
-        <thead>
-          <tr>
-            <th>balance</th>
-            <th>address</th>
+    <Card>
+      <Card.Content>
+        <Card.Header>Richest Accts</Card.Header>
+      
+      <Table celled inverted selectable>
+        <Table.Header>
+          <Table.Row>
+            <Table.HeaderCell>balance</Table.HeaderCell>
+            <Table.HeaderCell>address</Table.HeaderCell>
          
-          </tr>
-        </thead>
-        <tbody>{renderTable()}</tbody>
-      </table>
-    </div>
+          </Table.Row>
+        </Table.Header>
+        <Table.Body>{renderTable()}</Table.Body>
+      </Table>
+    </Card.Content>
+    </Card>
   )
 }
 
