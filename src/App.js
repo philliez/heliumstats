@@ -21,24 +21,23 @@ class App extends React.Component {
   }
   
   getListings() {
+  
     axios.get('https://api.helium.wtf/v1/accounts/rich?limit=20')
     .then((response) => {
-      for (var i = 0; i<1000; i++) {
-        var item = {}; 
-        this.columnDefs.forEach(col columnDef => {
-          item[col] = '('+col.toUpperCase()+','+i+')'
-        });
-      this.rowData.push(item);
-    }
-
-  return this.rowData;
-})}
-
+      let rows = []
+              for (const data in response) {
+          
+       rows.push(data)
+        }
+   
+  return rows })
+}
 
   componentDidMount () {
     this.getListings();
   }
   render() {
+    
     return (
         <Grid columns={3}>
           <Grid.Row>
@@ -53,7 +52,7 @@ class App extends React.Component {
                 >
                   <AgGridReact
                     columnDefs={this.state.columnDefs}
-                    rowData={this.state.rowData.data}>
+                    rowData={this.state.rowData}>
                   </AgGridReact>
                 </div>
               </Segment>
