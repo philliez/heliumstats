@@ -36,7 +36,6 @@
             <Table.HeaderCell>address</Table.HeaderCell>
 
             <Table.HeaderCell>hotspots</Table.HeaderCell>
-            <Table.HeaderCell>hotspots</Table.HeaderCell>
 
          
           </Table.Row>
