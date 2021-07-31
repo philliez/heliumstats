@@ -4,24 +4,29 @@
 
 
  export default function App() {
-  const url = 'https://api.helium.wtf/v1/accounts/rich?limit=20'
+  const url = 'https://api.helium.wtf/v1/'
 
-  const [data, setData] = useState([])
+  const [richdata, setRichData] = useState([])
+  const getRichest = () => { axios.get(url + 'accounts/rich?limit=20').then(response => setRichData(response.data.data))}
 
   useEffect(() => {
-    axios.get(url).then(response => setData(response.data.data))
-  }, [])
+    getRichest()
+   
+  }, []);
+
 
   const renderTable = () => {
-    return data.map(account => {
+    return richdata.map(account => {
       return (
         <Table.Row>
           <Table.Cell>{account.balance}</Table.Cell>
-                    <Table.Cell selectable><a href={ 'https://explorer.helium.com/accounts' + account.address + '/' }>Account</a></Table.Cell>
+                    <Table.Cell selectable><a href={ 'https://explorer.helium.com/accounts/' + account.address + '/' }>Account</a></Table.Cell>
             </Table.Row>
       )
     })
   }
+
+
 
   return (
     <Card>
