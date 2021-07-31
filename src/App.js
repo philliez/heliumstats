@@ -17,7 +17,13 @@
       return (
         <Table.Row>
           <Table.Cell>{account.balance}</Table.Cell>
-          <Table.Cell>{account.address}</Table.Cell>
+          <Table.Cell selectable>{ return (let hS = []; axios.get('https://api.helium.wtf/v1/accounts/' + account.address + '/hotspots').then(response => hS.push(response)); return hS.length )}</Table.Cell>
+          <Table.Cell selectable><a href={ 'https://api.helium.wtf/v1/accounts/' + account.address + '/hotspots'}>Hotspots
+
+          </a></Table.Cell>
+          <Table.Cell selectable><a href={ 'https://api.helium.wtf/v1/accounts/' + account.address + '/rewards'}>rewards
+
+          </a></Table.Cell>
             </Table.Row>
       )
     })
@@ -33,6 +39,10 @@
           <Table.Row>
             <Table.HeaderCell>balance</Table.HeaderCell>
             <Table.HeaderCell>address</Table.HeaderCell>
+
+            <Table.HeaderCell>hotspots</Table.HeaderCell>
+            <Table.HeaderCell>hotspots</Table.HeaderCell>
+
          
           </Table.Row>
         </Table.Header>
