@@ -17,8 +17,7 @@
       return (
         <Table.Row>
           <Table.Cell>{account.balance}</Table.Cell>
-          <Table.Cell selectable><a href={ 'https://api.helium.wtf/v1/accounts/' + account.address + '/hotspots'}>Hotspots</a></Table.Cell>
-          <Table.Cell selectable><a href={ 'https://api.helium.wtf/v1/accounts/' + account.address + '/rewards'}>rewards</a></Table.Cell>
+                    <Table.Cell selectable><a href={ 'https://explorer.helium.com/accounts' + account.address + '/' }>Account</a></Table.Cell>
             </Table.Row>
       )
     })
@@ -33,9 +32,8 @@
         <Table.Header>
           <Table.Row>
             <Table.HeaderCell>balance</Table.HeaderCell>
-            <Table.HeaderCell>address</Table.HeaderCell>
+            <Table.HeaderCell>account</Table.HeaderCell>
 
-            <Table.HeaderCell>hotspots</Table.HeaderCell>
 
          
           </Table.Row>
