@@ -119,7 +119,7 @@ function Dashboard() {
   <span>Choose City</span>
   <div className="mt-3"><span>{selected}</span></div>
    <Select className="mt-1" value={selected} onChange={handleChange}>
-   {cities.map((city, i) => (<option>{city.short_city}</option>))}
+   {cities.map((city, i) => (<option value={city.city_id}>{city.short_city}</option>))}
            
           </Select> 
         </Label>        
