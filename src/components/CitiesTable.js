@@ -116,7 +116,8 @@ export const CitiesTable = () => {
     }
   }
 `
-  
+const data = cities
+ 
     const columns = [
     {
       Header: "Name",
@@ -167,7 +168,6 @@ const renderRowSubComponent = React.useCallback(
   const [cities, setCities] = useState([])
   const getCities =  () => { if (!data.length) {  axios.get(url + 'cities').then(response => setCities(response.data.data))} return cities }
 
-  const data = cities
   const {
     getTableProps,
     getTableBodyProps,
