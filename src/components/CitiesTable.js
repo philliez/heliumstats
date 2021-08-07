@@ -65,6 +65,7 @@ export const CitiesTable = () => {
         );
       }
       
+      
       const SubRowAsync =({ row, rowProps, visibleColumns }) => {
         const [loading, setLoading] = useState(true);
         const [data, setData] = useState([]);
@@ -115,6 +116,33 @@ export const CitiesTable = () => {
     }
   }
 `
+const renderRowSubComponent = React.useCallback(
+  ({ row, rowProps, visibleColumns }) => (
+    <SubRowAsync
+      row={row}
+      rowProps={rowProps}
+      visibleColumns={visibleColumns}
+    />
+  ),
+  []
+);
+
+
+
+  return (
+      <Styles>
+        <Table
+          columns={columns}
+          data={data}
+          // We added this as a prop for our table component
+          // Remember, this is not part of the React Table API,
+          // it's merely a rendering option we created for
+          // ourselves
+          renderRowSubComponent={renderRowSubComponent}
+        />
+      </Styles>
+    );
+  
     const columns = [
     {
       Header: "Name",
@@ -217,31 +245,4 @@ export const CitiesTable = () => {
     </Card>
   );    
 
-    
-    const renderRowSubComponent = React.useCallback(
-        ({ row, rowProps, visibleColumns }) => (
-          <SubRowAsync
-            row={row}
-            rowProps={rowProps}
-            visibleColumns={visibleColumns}
-          />
-        ),
-        []
-      );
-    
-    
-
-        return (
-            <Styles>
-              <Table
-                columns={columns}
-                data={data}
-                // We added this as a prop for our table component
-                // Remember, this is not part of the React Table API,
-                // it's merely a rendering option we created for
-                // ourselves
-                renderRowSubComponent={renderRowSubComponent}
-              />
-            </Styles>
-          );
-        }
+      }
