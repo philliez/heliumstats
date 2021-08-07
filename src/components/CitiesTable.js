@@ -116,6 +116,27 @@ export const CitiesTable = () => {
     }
   }
 `
+  
+    const columns = [
+    {
+      Header: "Name",
+      accessor: "short_city",
+    },
+   
+    {
+      Header: "Country",
+      accessor: "short_country",
+    },
+    {
+        Header: "hotspots",
+        accessor: "hotspot_count",
+      },
+      {
+        Header: "Online Hotspots",
+        accessor: "online_count",
+      },
+  ];
+
 const renderRowSubComponent = React.useCallback(
   ({ row, rowProps, visibleColumns }) => (
     <SubRowAsync
@@ -142,26 +163,6 @@ const renderRowSubComponent = React.useCallback(
         />
       </Styles>
     );
-  
-    const columns = [
-    {
-      Header: "Name",
-      accessor: "short_city",
-    },
-   
-    {
-      Header: "Country",
-      accessor: "short_country",
-    },
-    {
-        Header: "hotspots",
-        accessor: "hotspot_count",
-      },
-      {
-        Header: "Online Hotspots",
-        accessor: "online_count",
-      },
-  ];
   const url = 'https://api.helium.wtf/v1/'
   const [cities, setCities] = useState([])
   const getCities =  () => { if (!data.length) {  axios.get(url + 'cities').then(response => setCities(response.data.data))} return cities }
