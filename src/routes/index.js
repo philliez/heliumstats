@@ -11,6 +11,7 @@ const Tables = lazy(() => import('../pages/Tables'))
 const Page404 = lazy(() => import('../pages/404'))
 const Blank = lazy(() => import('../pages/Blank'))
 const Cities = lazy(() => import ('../pages/Cities'))
+const City = lazy(() => import ('../pages/City'))
 
 /**
  * ⚠ These are internal routes!
@@ -60,7 +61,9 @@ const routes = [
     component: Blank,
   },
   { path: '/cities',
-    component: Cities}
+    component: Cities},
+    { path: '/city/:cityId',
+    component: City}
 ]
 
 export default routes
