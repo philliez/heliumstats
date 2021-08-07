@@ -25,6 +25,7 @@ import {
   Pagination,
 } from '@windmill/react-ui'
 
+import { CitiesTable, Reacttable } from "../components/CitiesTable";
 
 import {
   doughnutOptions,
@@ -37,27 +38,34 @@ function Dashboard() {
   const [page, setPage] = useState(1)
   const [data, setData] = useState([])
   const [cities, setCities] = useState([])
-  const [selected, setSelected] = useState([])
+  const [selected, setSelected] = useState(['YWJpbGVuZXRleGFzdW5pdGVkIHN0YXRlcw'])
+  const [selectedData, setSelectedData] = useState([])
   const [cityStrings, setCityStrings] = useState([])  // pagination setup
 
   const url = 'https://api.helium.wtf/v1/'
 
   const [richdata, setRichData] = useState([])
   const [hotspots, setHotspots] = useState([])
-  const getRichest = () => { axios.get(url + 'accounts/rich?limit=20').then(response => setRichData(response.data.data))}
-  const getCities = () =>  { axios.get(url + 'cities').then(response => setCities(response.data.data))
-  
-    
-  }
- const handleChange = (event) => {
-    setSelected(event.target.value);
-  }
-  const [seletedCity, setSelectedCity] = useState('')
-  const getSelected = (props) => {const selectedUrl = 'https://api.helium.io/v1/cities/' + this.props.account.address + '/'; axios.get(selectedUrl).then(response => setSelected(response.data.data))}
+  const getRichest = async () => { axios.get(url + 'accounts/rich?limit=20').then(response => setRichData(response.data.data))}
+  const getCities = async () => { axios.get(url + 'cities').then(response => setCities(response.data.data))}
+  const handleChange = (event) => {
+    setSelected(event.target.value)(selected => { axios.get(`https://api.helium.io/v1/cities/${selected}/hotspots`)
+    .finally(response =>  setSelectedData(response.data.data));
+    return selectedData
+
+  })}
+
+  const [selectedCity, setSelectedCity] = useState('')
+  const getSelected = (selected, selectedCity) => {const selectedUrl = ('https://api.helium.io/v1/cities/' + selected.key + '/hotspots'); 
+      axios.get(selectedUrl).then(response => selectedCity.push(response.data.data)); setSelectedData(selectedData)
+
+
+    }
 
   useEffect(() => {
     getRichest()
-   getCities()
+   
+   
   }, []);
 
   const resultsPerPage = 20
@@ -69,17 +77,27 @@ function Dashboard() {
   // on page change, load new sliced data
   // here you would make another server request for new data
   useEffect(() => {
+     
+     
+
     setData(response.slice((page - 1) * resultsPerPage, page * resultsPerPage))
   }, [page])
+ 
+   
+      return (
+        <div>
 
-  return (
-    <>
-      <PageTitle>Dashboard</PageTitle>
+{ selected.length?
+     <PageTitle>{`Stats for ${selectedData}`}</PageTitle> 
+     : 
+       <PageTitle>Dashboard</PageTitle>  
+}  
+  
 
-{/* 
-      {/* <!-- Cards --> *
+
+      {/* <!-- Cards --> **/}
       <div className="grid gap-6 mb-8 md:grid-cols-2 xl:grid-cols-4">
-        <InfoCard title="Total clients" value="6389">
+        <InfoCard title="Hotspots" value={selected.length}>
           <RoundIcon
             icon={PeopleIcon}
             iconColorClass="text-orange-500 dark:text-orange-100"
@@ -88,7 +106,7 @@ function Dashboard() {
           />
         </InfoCard>
 
-        <InfoCard title="Account balance" value="$ 46,760.89">
+        <InfoCard title="Hotspots" value={selected.length}>
           <RoundIcon
             icon={MoneyIcon}
             iconColorClass="text-green-500 dark:text-green-100"
@@ -96,7 +114,7 @@ function Dashboard() {
             className="mr-4"
           />
         </InfoCard>
-
+{/* 
         <InfoCard title="New sales" value="376">
           <RoundIcon
             icon={CartIcon}
@@ -113,48 +131,48 @@ function Dashboard() {
             bgColorClass="bg-teal-100 dark:bg-teal-500"
             className="mr-4"
           />
-        </InfoCard>
-      </div> */}
+        </InfoCard> */}
+      </div> 
   <Label className="mt-4">
   <span>Choose City</span>
-  <div className="mt-3"><span>{selected}</span></div>
-   <Select className="mt-1" value={selected} onChange={handleChange}>
-   {cities.map((city, i) => (<option value={city.city_id}>{city.short_city}</option>))}
+  <p>{selectedData} </p>
+  <div className="mt-3"><span>{selectedData.short_city}</span></div>
+   <Select className="mt-1" value={`${selected}`} onChange={handleChange}>
+   {cities.map((city, i) => (<option key={i} value={city.city_id}>{city.short_city}</option>))}
            
           </Select> 
         </Label>        
-
-      <TableContainer>
+<CitiesTable />
+      {/* <TableContainer>
         <Table>
           <TableHeader>
             <tr>
-              <TableCell>HNT</TableCell>
+              <TableCell>status</TableCell>
               <TableCell>Account</TableCell>
-              <TableCell>Hotspots</TableCell>
+              <TableCell>owner</TableCell>
             
             </tr>
           </TableHeader>
           <TableBody>
-            {richdata.map((account, i) => (
+            {selectedData.map((hotspot, i) => (
               <TableRow key={i}>
                 <TableCell>
                   <div className="flex items-center text-sm">
                     
                     <div>
-                      <p className="font-semibold">{account.balance}</p>
+                      <p className="font-semibold">{hotspot.status}</p>
                       
                     </div>
                   </div>
                 </TableCell>
                  <TableCell>
-                  <span className="text-sm"> <a href={ 'https://explorer.helium.com/accounts/' + account.address + '/' }>Account</a></span>
-                </TableCell>
+                 <p className="font-semibold">{hotspot.owner}</p>                </TableCell>
                 <TableCell>
-                  
+                <p className="font-semibold">{hotspot.score}</p>
                 </TableCell>
                {/* <TableCell>
                   <span className="text-sm">{new Date(user.date).toLocaleDateString()}</span>
-                </TableCell> */}
+                </TableCell> 
               </TableRow>
             ))}
           </TableBody>
@@ -167,9 +185,10 @@ function Dashboard() {
             onChange={onPageChange}
           />
         </TableFooter>
-      </TableContainer>
+               </TableContainer>*/}
+      </div> 
 
-      {/* <PageTitle>Charts</PageTitle>
+      /* <PageTitle>Charts</PageTitle>
       <div className="grid gap-6 mb-8 md:grid-cols-2">
         <ChartCard title="Revenue">
           <Doughnut {...doughnutOptions} />
@@ -180,9 +199,7 @@ function Dashboard() {
           <Line {...lineOptions} />
           <ChartLegend legends={lineLegends} />
         </ChartCard>
-      </div> */}
-    </>
-  )
-}
-
+      </div> */    
+  
+      )}
 export default Dashboard
