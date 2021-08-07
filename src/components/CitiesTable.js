@@ -21,6 +21,75 @@ import {
   } from '@windmill/react-ui'
   
 export const CitiesTable = () => { 
+
+    function SubRows({ row, rowProps, visibleColumns, data, loading }) {
+        if (loading) {
+          return (
+            <tr>
+              <td/>
+              <td colSpan={visibleColumns.length - 1}>
+                Loading...
+              </td>
+            </tr>
+          );
+        }
+      
+        // error handling here :)
+      
+        return (
+          <>
+            {data.map((x, i) => {
+              return (
+                <tr
+                  {...rowProps}
+                  key={`${rowProps.key}-expanded-${i}`}
+                >
+                  {row.cells.map((cell) => {
+                    return (
+                      <td
+                        {...cell.getCellProps()}
+                      >
+                        {cell.render(cell.column.SubCell ? 'SubCell' : 'Cell', {
+                          value:
+                            cell.column.accessor &&
+                            cell.column.accessor(x, i),
+                          row: { ...row, original: x }
+                        })}
+                      </td>
+                    );
+                  })}
+                </tr>
+              );
+            })}
+          </>
+        );
+      }
+      
+      const SubRowAsync =({ row, rowProps, visibleColumns }) => {
+        const [loading, setLoading] = useState(true);
+        const [data, setData] = useState([]);
+      
+        useEffect(() => {
+          const timer = setTimeout(() => {
+            setData(getCities);
+            setLoading(false);
+          }, 500);
+      
+          return () => {
+            clearTimeout(timer);
+          };
+        }, []);
+      
+        return (
+          <SubRows
+            row={row}
+            rowProps={rowProps}
+            visibleColumns={visibleColumns}
+            data={data}
+            loading={loading}
+          />
+        );
+      }
     
     const Styles = styled.div`
   padding: 1rem;
@@ -80,6 +149,7 @@ export const CitiesTable = () => {
   } = useTable({
     columns,
     data,
+    renderRowSubComponent,
     autoResetHiddenColumns: false
   },
   useSortBy
@@ -120,23 +190,58 @@ export const CitiesTable = () => {
             </tr>
           ))}
         </thead>
-      <tbody {...getTableBodyProps()}>
+      
+        <tbody {...getTableBodyProps()}>
         {rows.map((row, i) => {
           prepareRow(row);
+          const rowProps = row.getRowProps();
           return (
-            <tr {...row.getRowProps()}>
-              {row.cells.map((cell) => {
-                return <td {...cell.getCellProps()}>{cell.render("Cell")}</td>;
-              })}
-            </tr>
+            // Use a React.Fragment here so the table markup is still valid
+            <React.Fragment key={rowProps.key}>
+              <tr {...rowProps}>
+                {row.cells.map(cell => {
+                  return (
+                    <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
+                  );
+                })}
+              </tr>
+              {/* We could pass anything into this */}
+              {row.isExpanded &&
+                renderRowSubComponent({ row, rowProps })}
+            </React.Fragment>
           );
         })}
-      </tbody>
-    </Table>
+        </tbody> </Table>
     </div>
     </div>
     </Card>
   );    
 
-    }
+    
+    const renderRowSubComponent = React.useCallback(
+        ({ row, rowProps, visibleColumns }) => (
+          <SubRowAsync
+            row={row}
+            rowProps={rowProps}
+            visibleColumns={visibleColumns}
+          />
+        ),
+        []
+      );
+    
+    
 
+        return (
+            <Styles>
+              <Table
+                columns={columns}
+                data={data}
+                // We added this as a prop for our table component
+                // Remember, this is not part of the React Table API,
+                // it's merely a rendering option we created for
+                // ourselves
+                renderRowSubComponent={renderRowSubComponent}
+              />
+            </Styles>
+          );
+        }
