@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
+
 import { SidebarContext } from '../context/SidebarContext'
 import {
   SearchIcon,
@@ -10,6 +11,7 @@ import {
   OutlineCogIcon,
   OutlineLogoutIcon,
 } from '../icons'
+import  firebase from '../firestore'
 import { Avatar, Badge, Input, Dropdown, DropdownItem, WindmillContext } from '@windmill/react-ui'
 import axios from 'axios'
 
@@ -20,6 +22,7 @@ function Header() {
   const [isNotificationsMenuOpen, setIsNotificationsMenuOpen] = useState(false)
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false)
   const [token, setToken] = useState([])
+  const [tokenData, setTokenData] = useState([])
   function handleNotificationsClick() {
     setIsNotificationsMenuOpen(!isNotificationsMenuOpen)
   }
@@ -27,12 +30,32 @@ function Header() {
   function handleProfileClick() {
     setIsProfileMenuOpen(!isProfileMenuOpen)
   }
+  async function getPrice() {
+    const response = await axios('https://api.coingecko.com/api/v3/simple/price?ids=helium&vs_currencies=USD')
+    .then(response => setToken(response.data.helium.usd))
   
-  function heliumToken() { axios.get('https://api.coingecko.com/api/v3/coins/helium').then(response => setToken(response.data.data)); return token}
+  }
+
+  setInterval(() => {
+    getPrice();
+    heliumToken();
+    fetchHotspots()
+  }, 50000)
+  
+  function heliumToken() { axios.get('https://api.coingecko.com/api/v3/simple/price?ids=helium&vs_currencies=USD').then(response => setTokenData(JSON.stringify(response.data)))}
+  function fetchHotspots() { let hotspots = []; axios.get('https://api.helium.wtf/v1/hotspots/')
+  .then(response => hotspots.push(response.data))
+  hotspots.forEach(hotspot => {
+    
+  
+  firebase.firestore().collection('hotspots').doc(firebase.firestore.Timestamp.now().seconds).collection(hotspot.data.data.hotspot_id).doc().add()
+  
+    
+  })}
   useEffect(() => {
-    const tokenData = () => {
-         heliumToken() }
-         tokenData()
+    const gettokenData = () => {
+         getPrice() }
+         gettokenData()
          
      }, []
      );
@@ -75,8 +98,8 @@ function Header() {
               )}
             </button>
           </li>
-         
-          <li className="relative">
+         <p style={{fontSize: 20}}>HNT|USD={token}  </p>
+          <li className="relative text-purple-900">
             <button
               className="relative align-middle rounded-md focus:outline-none focus:shadow-outline-purple"
               onClick={handleNotificationsClick}
@@ -88,8 +111,9 @@ function Header() {
               <span
                 aria-hidden="true"
                 className="absolute top-0 right-0 inline-block w-3 h-3 transform translate-x-1 -translate-y-1 bg-red-600 border-2 border-white rounded-full dark:border-gray-800"
-              ><p>{token}</p></span>
+              ><p></p></span>
             </button>
+            <div></div>
  {/* </li>            <Dropdown
               align="right"
               isOpen={isNotificationsMenuOpen}

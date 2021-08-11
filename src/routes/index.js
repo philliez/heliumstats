@@ -12,6 +12,7 @@ const Page404 = lazy(() => import('../pages/404'))
 const Blank = lazy(() => import('../pages/Blank'))
 const Cities = lazy(() => import ('../pages/Cities'))
 const City = lazy(() => import ('../pages/City'))
+const Location = lazy(() => import ('../pages/Location'))
 
 /**
  * ⚠ These are internal routes!
@@ -27,6 +28,10 @@ const routes = [
   {
     path: '/dashboard', // the url
     component: Dashboard, // view rendered
+  },
+  {
+    path: '/location',
+    component: Location,
   },
   {
     path: '/forms',

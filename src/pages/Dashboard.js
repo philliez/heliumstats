@@ -9,6 +9,7 @@ import PageTitle from '../components/Typography/PageTitle'
 import { ChatIcon, CartIcon, MoneyIcon, PeopleIcon } from '../icons'
 import RoundIcon from '../components/RoundIcon'
 import response from '../utils/demo/tableData'
+import firebase from '../firestore'
 import axios from 'axios'
 import {
   TableBody,
@@ -38,7 +39,7 @@ function Dashboard() {
   const [page, setPage] = useState(1)
   const [data, setData] = useState([])
   const [cities, setCities] = useState([])
-  const [selected, setSelected] = useState(['YWJpbGVuZXRleGFzdW5pdGVkIHN0YXRlcw'])
+  const [selected, setSelected] = useState([])
   const [selectedData, setSelectedData] = useState([])
   const [cityStrings, setCityStrings] = useState([])  // pagination setup
 
@@ -47,23 +48,27 @@ function Dashboard() {
   const [richdata, setRichData] = useState([])
   const [hotspots, setHotspots] = useState([])
   const getRichest = async () => { axios.get(url + 'accounts/rich?limit=20').then(response => setRichData(response.data.data))}
-  const getCities = async () => { axios.get(url + 'cities').then(response => setCities(response.data.data))}
+  const getCities = async () => { axios.get(url + 'cities').then(response => setCities(response.data.data))
+cities.forEach(city => { firebase.firestore().collection('cities').doc(city.short_city).set(city)
+  
+}); }
   const handleChange = (event) => {
     setSelected(event.target.value)(selected => { axios.get(`https://api.helium.io/v1/cities/${selected}/hotspots`)
-    .finally(response =>  setSelectedData(response.data.data));
+    .then(response =>  setSelectedData(response));
     return selectedData
 
   })}
 
-  const [selectedCity, setSelectedCity] = useState('')
-  const getSelected = (selected, selectedCity) => {const selectedUrl = ('https://api.helium.io/v1/cities/' + selected.key + '/hotspots'); 
-      axios.get(selectedUrl).then(response => selectedCity.push(response.data.data)); setSelectedData(selectedData)
+  // // const [selectedCity, setSelectedCity] = useState('YWJpbGVuZXRleGFzdW5pdGVkIHN0YXRlcw')
+  // // const getSelected = () => {const selectedUrl = ('https://api.helium.io/v1/cities/' + selected.key + '/hotspots'); 
+  // //     axios.get(selectedUrl).then(response => setSelectedData(response.data.data)); 
 
 
-    }
+  //   }
 
   useEffect(() => {
-    getRichest()
+    // getRichest()
+    getCities()
    
    
   }, []);
@@ -88,7 +93,7 @@ function Dashboard() {
         <div>
 
 { selected.length?
-     <PageTitle>{`Stats for ${selectedData}`}</PageTitle> 
+     <PageTitle>{`Stats for ${JSON.stringify(selectedData)}`}</PageTitle> 
      : 
        <PageTitle>Dashboard</PageTitle>  
 }  
@@ -106,7 +111,7 @@ function Dashboard() {
           />
         </InfoCard>
 
-        <InfoCard title="Hotspots" value={selected.length}>
+        <InfoCard title="Rewards" value={selected.data}>
           <RoundIcon
             icon={MoneyIcon}
             iconColorClass="text-green-500 dark:text-green-100"
@@ -137,7 +142,7 @@ function Dashboard() {
   <span>Choose City</span>
   <p>{selectedData} </p>
   <div className="mt-3"><span>{selectedData.short_city}</span></div>
-   <Select className="mt-1" value={`${selected}`} onChange={handleChange}>
+   <Select className="mt-1" value={selected} onChange={handleChange}>
    {cities.map((city, i) => (<option key={i} value={city.city_id}>{city.short_city}</option>))}
            
           </Select> 

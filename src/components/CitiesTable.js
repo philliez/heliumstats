@@ -65,7 +65,7 @@ export const CitiesTable = () => {
         );
       }
       
-      
+      const selectedCity = {}
       const SubRowAsync =({ row, rowProps, visibleColumns }) => {
         const [loading, setLoading] = useState(true);
         const [data, setData] = useState([]);
@@ -116,7 +116,7 @@ export const CitiesTable = () => {
     }
   }
 `
-const data = cities
+   const data = selectedCity
  
     const columns = [
     {
