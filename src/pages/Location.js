@@ -39,7 +39,11 @@ function Charts() {
             }
         );
     }
+    function onPageChangeTable1(p) {
+        setPageTable1(p)
+    }
 
+    const [pageTable1, setPageTable1] = useState(1)
     const onChange = async (event) => {
         Geocode.setApiKey("AIzaSyAYpI33CT22RGi_jtlMpFiRZ8kCwSSYtBI");
 
@@ -56,7 +60,7 @@ function Charts() {
                 }
             )
     }
-
+    const totalResults = zone.length
     const nearbyHotspots = async (lat, lng) => {
         await axios.get(`https://api.helium.wtf/v1/hotspots/location/distance/?lat=${result.lat}&lon=${result.lng}&distance=3000`)
             .then(response => setZone(response))
@@ -86,6 +90,45 @@ function Charts() {
 
             </div>
             <div className="grid gap-6 mb-8 md:grid-cols-2">
+                <TableContainer className="mb-8">
+                    <Table>
+                        <TableHeader>
+                            <tr>
+                                <TableCell>location</TableCell>
+                                <TableCell>status</TableCell>
+                                <TableCell>date</TableCell>
+                                <TableCell>address</TableCell>
+                            </tr>
+                        </TableHeader>
+                        <TableBody>
+                            {zone.map((hotspot, i) => (
+                                <TableRow key={i}>
+
+                                    <TableCell>
+                                        <span className="text-sm">{hotspot.location}</span>
+                                    </TableCell>
+                                    <TableCell>
+                                        <span className="text-sm">{hotspot.status.online}</span>
+                                    </TableCell>
+                                    <TableCell>
+                                        <span className="text-sm">{new Date(hotspot.status.timestamp).toLocaleDateString()}</span>
+                                    </TableCell>
+                                    <TableCell>
+                                        <span className="text-sm">{hotspot.address}</span>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                    <TableFooter>
+                        <Pagination
+                            totalResults={totalResults}
+                            resultsPerPage={resultsPerPage}
+                            onChange={onPageChangeTable1}
+                            label="Table navigation"
+                        />
+                    </TableFooter>
+                </TableContainer>
                 <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
                     <p>{JSON.stringify(zone)}</p>
                 </div>
