@@ -1,8 +1,21 @@
 import React from 'react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import axios from 'axios'
 import Geocode from 'react-geocode'
-import { Input, HelperText, Card, Text, Label, Button, Select, Textarea } from '@windmill/react-ui'
+import { Input, HelperText, Card, Text, Label, Select, Textarea } from '@windmill/react-ui'
+import {
+    Table,
+    TableHeader,
+    TableCell,
+    TableBody,
+    TableRow,
+    TableFooter,
+    TableContainer,
+    Badge,
+    Avatar,
+    Button,
+    Pagination,
+} from '@windmill/react-ui'
 
 import ChartCard from '../components/Chart/ChartCard'
 import { Doughnut, Line, Bar } from 'react-chartjs-2'
@@ -26,6 +39,7 @@ function Charts() {
     const [fetched, setFetched] = useState(false)
     const [result, setResult] = useState([])
     const [zone, setZone] = useState([])
+    const resultsPerPage = 10
     function goGet() {
         Geocode.fromAddress(address).then(
             (response) => {
@@ -61,6 +75,11 @@ function Charts() {
             )
     }
     const totalResults = zone.length
+    useEffect(() => {
+        setDataTable1(zone.slice((pageTable1 - 1) * resultsPerPage, pageTable1 * resultsPerPage))
+    }, [pageTable1])
+    const [dataTable1, setDataTable1] = useState([])
+
     const nearbyHotspots = async (lat, lng) => {
         await axios.get(`https://api.helium.wtf/v1/hotspots/location/distance/?lat=${result.lat}&lon=${result.lng}&distance=3000`)
             .then(response => setZone(response))
@@ -101,7 +120,7 @@ function Charts() {
                             </tr>
                         </TableHeader>
                         <TableBody>
-                            {zone.map((hotspot, i) => (
+                            {dataTable1.map((hotspot, i) => (
                                 <TableRow key={i}>
 
                                     <TableCell>
@@ -130,7 +149,7 @@ function Charts() {
                     </TableFooter>
                 </TableContainer>
                 <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
-                    <p>{JSON.stringify(zone)}</p>
+                    <p>{JSON.stringify(zone.data)}</p>
                 </div>
                 {/* <ChartCard title="Lines">
                     <Line {...lineOptions} />
