@@ -30,12 +30,15 @@ import {
     barLegends,
 } from '../utils/demo/chartsData'
 import InfoCard from '../components/Cards/InfoCard'
+import { ComposableMap, Geographies, Geography } from "react-simple-maps";
+import { Marker } from "react-simple-maps"
 
 function Charts() {
 
     const [address, setAddress] = useState('');
     const [lat, setLat] = useState('');
     const [lng, setLng] = useState('');
+    const coords = [lng, lat];
     const [fetched, setFetched] = useState(false)
     const [result, setResult] = useState([])
     const [zone, setZone] = useState([])
@@ -56,7 +59,30 @@ function Charts() {
     function onPageChangeTable1(p) {
         setPageTable1(p)
     }
+    const geoUrl =
+        "https://raw.githubusercontent.com/zcreativelabs/react-simple-maps/master/topojson-maps/world-110m.json";
 
+    const MapChart = () => {
+        return (
+            <ComposableMap projection="geoAlbers">
+                <Geographies geography={geoUrl}>
+                    {({ geographies }) =>
+                        geographies.map(geo => (
+                            <Geography
+                                key={geo.rsmKey}
+                                geography={geo}
+                                fill="#DDD"
+                                stroke="#FFF"
+                            />
+                        ))
+                    }
+                </Geographies>
+                <Marker coordinates={coords}>
+                    <circle r={8} fill="#F53" />
+                </Marker>
+            </ComposableMap>
+        );
+    };
     const [pageTable1, setPageTable1] = useState(1)
     const onChange = async (event) => {
         Geocode.setApiKey("AIzaSyAYpI33CT22RGi_jtlMpFiRZ8kCwSSYtBI");
@@ -76,7 +102,7 @@ function Charts() {
     }
     const totalResults = zone.length
     useEffect(() => {
-        setDataTable1(zone.slice((pageTable1 - 1) * resultsPerPage, pageTable1 * resultsPerPage))
+        setDataTable1(zone)
     }, [pageTable1])
     const [dataTable1, setDataTable1] = useState([])
 
@@ -88,17 +114,7 @@ function Charts() {
     }
 
 
-    if (!fetched)
-        return (
-
-            <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
-                <p>enter location</p>
-                <Input className="mt-1" placeholder="Address" onChange={onChange} />
-                <p>{lat},{lng}</p>
-                <Button onClick={nearbyHotspots}>Show Hotspots</Button>
-
-            </div>)
-    else return (
+    return (
         <>
             <PageTitle>Locations</PageTitle>
             <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
@@ -109,45 +125,59 @@ function Charts() {
 
             </div>
             <div className="grid gap-6 mb-8 md:grid-cols-2">
-                <TableContainer className="mb-8">
-                    <Table>
-                        <TableHeader>
-                            <tr>
-                                <TableCell>location</TableCell>
-                                <TableCell>status</TableCell>
-                                <TableCell>date</TableCell>
-                                <TableCell>address</TableCell>
-                            </tr>
-                        </TableHeader>
-                        <TableBody>
-                            {dataTable1.map((hotspot, i) => (
-                                <TableRow key={i}>
+                <div>
+                    <TableContainer className="mb-8">
+                        <Table>
+                            <TableHeader>
+                                <tr>
+                                    <TableCell>location</TableCell>
+                                    <TableCell>status</TableCell>
+                                    <TableCell>date</TableCell>
+                                    <TableCell>address</TableCell>
+                                </tr>
+                            </TableHeader>
+                            <TableBody>
+                                {dataTable1.map((hotspot, i) => (
+                                    < TableRow key={i} >
 
-                                    <TableCell>
-                                        <span className="text-sm">{hotspot.location}</span>
-                                    </TableCell>
-                                    <TableCell>
-                                        <span className="text-sm">{hotspot.status.online}</span>
-                                    </TableCell>
-                                    <TableCell>
-                                        <span className="text-sm">{new Date(hotspot.status.timestamp).toLocaleDateString()}</span>
-                                    </TableCell>
-                                    <TableCell>
-                                        <span className="text-sm">{hotspot.address}</span>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                    <TableFooter>
-                        <Pagination
-                            totalResults={totalResults}
-                            resultsPerPage={resultsPerPage}
-                            onChange={onPageChangeTable1}
-                            label="Table navigation"
-                        />
-                    </TableFooter>
-                </TableContainer>
+                                        <TableCell>
+                                            <span className="text-sm">{hotspot.location}</span>
+                                        </TableCell>
+                                        <TableCell>
+                                            <span className="text-sm">{hotspot.status.online}</span>
+                                        </TableCell>
+                                        <TableCell>
+                                            <span className="text-sm">{new Date(hotspot.status.timestamp).toLocaleDateString()}</span>
+                                        </TableCell>
+                                        <TableCell>
+                                            <span className="text-sm">{hotspot.address}</span>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                        <TableFooter>
+
+                        </TableFooter>
+                    </TableContainer>
+                </div>
+                <div>  <ComposableMap projection="geoAlbers">
+                    <Geographies geography={geoUrl}>
+                        {({ geographies }) =>
+                            geographies.map(geo => (
+                                <Geography
+                                    key={geo.rsmKey}
+                                    geography={geo}
+                                    fill="#DDD"
+                                    stroke="#FFF"
+                                />
+                            ))
+                        }
+                    </Geographies>
+                    <Marker coordinates={coords}>
+                        <circle r={8} fill="#F53" />
+                    </Marker>
+                </ComposableMap></div>
                 <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
                     <p>{JSON.stringify(zone.data)}</p>
                 </div>
